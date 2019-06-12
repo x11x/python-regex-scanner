@@ -1,3 +1,4 @@
+import sys
 from sre_parse import SubPattern, parse
 from sre_compile import compile as sre_compile
 from sre_constants import BRANCH, SUBPATTERN
@@ -16,6 +17,11 @@ except ImportError:
     # RegexFlags is not available
     # (We only need it for an instanceof check)
     from enum import Enum as RegexFlag
+
+
+# https://github.com/python/cpython/commit/be9a4e5c855188cf146962483e6de942bf154d95
+append_subpattern_extra_flags = (0, 0) if sys.version_info >= (3, 6) else ()
+
 
 class _ScanMatch(object):
 
@@ -96,7 +102,8 @@ class Scanner(object):
         for group, (name, regex) in enumerate(rules, 1):
             last_group = pattern.groups - 1
             subpatterns.append(SubPattern(pattern, [
-                (SUBPATTERN, (group, parse(regex, flags, pattern))),
+                (SUBPATTERN, (group, *append_subpattern_extra_flags,
+                    parse(regex, flags, pattern))),
             ]))
             self.rules.append((name, last_group, pattern.groups - 1))
 
