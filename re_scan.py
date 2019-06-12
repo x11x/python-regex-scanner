@@ -4,6 +4,11 @@ from sre_compile import compile as sre_compile
 from sre_constants import BRANCH, SUBPATTERN
 
 try:
+    basestring
+except NameError:
+    basestring = str
+
+try:
     # Pattern will be renamed to State in 3.8?
     # https://github.com/python/cpython/commit/e0c19ddc661e56cc7e694be52d3e47f1dfe5af24#diff-daea55f2fca784d9a64ca8f190403904
     from sre_parse import State as Pattern
