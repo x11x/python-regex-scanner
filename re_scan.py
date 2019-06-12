@@ -38,7 +38,7 @@ class _ScanMatch(object):
         if group == 0:
             return method()
         if isinstance(group, basestring):
-            return method(self._rule + '\x00' + group)
+            return method('\x00'.join(self._rule, group))
         real_group = self._start + group
         if real_group > self._end:
             raise IndexError('no such group')
@@ -95,7 +95,7 @@ class Scanner(object):
         pattern.groups = len(rules) + 1
 
         _og = pattern.opengroup
-        pattern.opengroup = lambda n: _og(n and '%s\x00%s' % (name, n) or n)
+        pattern.opengroup = lambda n: _og('\x00'.join((name, n)) if n else n)
 
         self.rules = []
         subpatterns = []
