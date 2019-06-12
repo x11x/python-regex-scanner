@@ -9,6 +9,14 @@ try:
 except ImportError:
     from sre_parse import Pattern
 
+try:
+    from re import RegexFlag
+except ImportError:
+    # RegexFlags is not public, but it is an Enum; so use that instead if
+    # RegexFlags is not available
+    # (We only need it for an instanceof check)
+    from enum import Enum as RegexFlag
+
 class _ScanMatch(object):
 
     def __init__(self, match, rule, start, end):
@@ -71,6 +79,11 @@ class ScanEnd(Exception):
 class Scanner(object):
 
     def __init__(self, rules, flags=0):
+        # Convert the flags to an int if they are not already
+        # https://github.com/python/cpython/commit/c1c47c166b1012d34f2c6e111ee9ccb5c4d12de7
+        if isinstance(flags, RegexFlag):
+            flags = flags.value
+
         pattern = Pattern()
         pattern.flags = flags
         pattern.groups = len(rules) + 1
